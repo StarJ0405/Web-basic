@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.2/dist/full.min.css" rel="stylesheet" type="text/css"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+<div class="bg-yellow-400">
+    <div class="bg-blue-300"><a href="/">logo</a></div>
+    <div class="bg-red-600 flex">
+        <div class="bg-blue-400 w-[20%] h-[800px] text-center ">
+            <ul class="h-[100%] overflow-y-scroll menu">
+                <li th:each="notebook : ${notebookList}">
+                    <a th:class="${(notebook.id==targetNotebook.id?'bg-red-200':'')+' w-full h-full'}" th:if="${#lists.isEmpty(notebook.noteBookList)}" th:href="@{|/detail/${notebook.id}|}" th:text="${notebook.name}"></a>
+                    <details open th:if="${!#lists.isEmpty(notebook.noteBookList)}">
+                        <summary th:class="${notebook.id==targetNotebook.id?'bg-red-200':''}"><a th:href="@{|/detail/${notebook.id}|}" th:text="${notebook.name}"></a></summary>
+                        <ul>
+                            <li th:class="${notebook.id==targetNotebook.id?'bg-red-200':''}" th:each="notebook : ${notebook.noteBookList}"><a th:href="@{|/detail/${notebook.id}|}" th:text="${notebook.name}"></a></li>
+                        </ul>
+                    </details>
+                </li>
+                <form action="/write" method="post">
+                    <input type="submit" value="추가" class="btn btn-success mt-3">
+                </form>
+                <form th:action="@{|/write/${targetNotebook.id}/sub|}" method="post">
+                    <input type="submit" value="추가" class="btn btn-info mt-3">
+                </form>
+            </ul>
+        </div>
+        <div class="bg-red-300 w-[20%] h-[800px] text-center ">
+            <ul class="h-[100%] overflow-y-scroll">
+                <li th:each="note : ${noteList}" th:class="${note.id==targetNote.id?'bg-blue-200':''}">
+                    <a th:href="@{|/detail/${targetNotebook.id}/${note.id}|}" th:text="${note.title}"></a>
+                </li>
+                <form th:action="@{|/write/${targetNotebook.id}|}" method="post">
+                    <input type="submit" value="추가" class="btn btn-success mt-3">
+                </form>
+            </ul>
+        </div>
+
+        <div class="bg-green-300 w-[80%]">
+            <form action="/update" method="post">
+                <div>
+                    <input type="hidden" name="id" th:value="${targetNote.id}">
+                </div>
+                <div>
+                    <input type="text" name="title" th:value="${targetNote.title}">
+                </div>
+                <div>
+                    <textarea class="resize-none mt-1" name="content" cols="30" rows="10"
+                              th:text="${targetNote.content}"></textarea>
+                </div>
+                <div>
+                    <input type="button" value="수정" onclick="fix(this)" class="btn btn-warning mt-1 ml-3">
+                </div>
+            </form>
+            <form th:action="@{|/delete/${targetNote.id}|}" method="post">
+                <div>
+                    <input type="button" value="삭제" onclick="remove(this)" class="btn btn-error ml-3 mt-1">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    function fix(element){
+        if(confirm('정말 수정하시겠습니까?'))
+            element.parentElement.parentElement.submit();
+    };
+    function remove(element){
+        if(confirm('정말 삭제하시겠습니까?'))
+            element.parentElement.parentElement.submit();
+    };
+</script>
+</html>
